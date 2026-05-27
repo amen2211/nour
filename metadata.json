@@ -1,0 +1,6 @@
+{
+  "name": "Nour",
+  "description": "منصة إسلامية شاملة تجمع القرآن الكريم، مواقيت الصلاة، الأذكار، والأدعية مع مساعد ذكي.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
