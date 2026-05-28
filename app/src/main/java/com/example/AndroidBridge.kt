@@ -15,7 +15,7 @@ class AndroidBridge(private val context: Context) {
     fun askGemini(msg: String): String {
         Log.d("AndroidBridge", "AI prompt: $msg")
         val apiKey = BuildConfig.GEMINI_API_KEY
-        if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isEmpty() || apiKey == "AIzaSyDM-7Xv3pEiaqYbdkH27c7DxVASObhrS4w") {
             return "عذراً، لم يتم تهيئة مفتاح API لمساعد نور. يرجى تهيئته عبر لوحة Secrets."
         }
         
@@ -44,12 +44,27 @@ class AndroidBridge(private val context: Context) {
         return try {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
             val clip = android.content.ClipData.newPlainText("Nour Copy", text)
+            var success = true
             (context as? android.app.Activity)?.runOnUiThread {
-                clipboard.setPrimaryClip(clip)
+                try {
+                    clipboard.setPrimaryClip(clip)
+                } catch (se: SecurityException) {
+                    Log.e("AndroidBridge", "SecurityException copying text natively in runOnUiThread: ${se.message}")
+                } catch (e: Exception) {
+                    Log.e("AndroidBridge", "Exception copying text natively in runOnUiThread: ${e.message}")
+                }
             } ?: run {
-                clipboard.setPrimaryClip(clip)
+                try {
+                    clipboard.setPrimaryClip(clip)
+                } catch (se: SecurityException) {
+                    Log.e("AndroidBridge", "SecurityException copying text natively: ${se.message}")
+                    success = false
+                } catch (e: Exception) {
+                    Log.e("AndroidBridge", "Exception copying text natively: ${e.message}")
+                    success = false
+                }
             }
-            true
+            success
         } catch (e: Exception) {
             Log.e("AndroidBridge", "Error copying text natively: ${e.message}", e)
             false
