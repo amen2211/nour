@@ -7,6 +7,11 @@ import android.webkit.JavascriptInterface
 class AndroidBridge(private val context: Context) {
 
     @JavascriptInterface
+    fun getApiKey(): String {
+        return BuildConfig.GEMINI_API_KEY
+    }
+
+    @JavascriptInterface
     fun askGemini(msg: String): String {
         Log.d("AndroidBridge", "AI prompt: $msg")
         val apiKey = BuildConfig.GEMINI_API_KEY
