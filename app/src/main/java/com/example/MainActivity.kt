@@ -32,12 +32,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
-        // Request Location and Notification permissions at launch for a seamless installation experience
-        requestPermissions()
 
         setContent {
             MyApplicationTheme {
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    // Request Location and Notification permissions after Compose has safely initialized the window
+                    requestPermissions()
+                }
                 WebViewContainer()
             }
         }
@@ -92,8 +93,22 @@ class MainActivity : ComponentActivity() {
                             origin: String,
                             callback: GeolocationPermissions.Callback
                         ) {
-                            // Automatically authorize WebView HTML5 geolocation queries
-                            callback.invoke(origin, true, false)
+                            val fineLocation = androidx.core.content.ContextCompat.checkSelfPermission(
+                                this@MainActivity,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                            val coarseLocation = androidx.core.content.ContextCompat.checkSelfPermission(
+                                this@MainActivity,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                            if (fineLocation || coarseLocation) {
+                                callback.invoke(origin, true, false)
+                            } else {
+                                // If not granted, invoke false to trigger JS fallback to IP-based lookup instead of crashing
+                                callback.invoke(origin, false, false)
+                            }
                         }
                     }
                     

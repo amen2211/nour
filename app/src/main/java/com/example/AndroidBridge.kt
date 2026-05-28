@@ -22,7 +22,7 @@ class AndroidBridge(private val context: Context) {
         )
         
         return try {
-            val response = kotlinx.coroutines.runBlocking {
+            val response = kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
                 GeminiClient.apiService.generateContent(apiKey, request)
             }
             val text = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
@@ -30,6 +30,24 @@ class AndroidBridge(private val context: Context) {
         } catch (e: Exception) {
             Log.e("AndroidBridge", "Error calling Gemini: ${e.message}", e)
             "عذراً، واجهت مشكلة في معالجة طلبك: ${e.localizedMessage ?: e.message}"
+        }
+    }
+
+    @JavascriptInterface
+    fun copyToClipboard(text: String): Boolean {
+        Log.d("AndroidBridge", "copyToClipboard called")
+        return try {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("Nour Copy", text)
+            (context as? android.app.Activity)?.runOnUiThread {
+                clipboard.setPrimaryClip(clip)
+            } ?: run {
+                clipboard.setPrimaryClip(clip)
+            }
+            true
+        } catch (e: Exception) {
+            Log.e("AndroidBridge", "Error copying text natively: ${e.message}", e)
+            false
         }
     }
 
