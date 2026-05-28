@@ -15,7 +15,7 @@ class AndroidBridge(private val context: Context) {
     fun askGemini(msg: String): String {
         Log.d("AndroidBridge", "AI prompt: $msg")
         val apiKey = BuildConfig.GEMINI_API_KEY
-        if (apiKey.isEmpty() || apiKey == "AIzaSyDM-7Xv3pEiaqYbdkH27c7DxVASObhrS4w") {
+        if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY" || apiKey == "PUT_YOUR_API_KEY_HERE") {
             return "عذراً، لم يتم تهيئة مفتاح API لمساعد نور. يرجى تهيئته عبر لوحة Secrets."
         }
         
